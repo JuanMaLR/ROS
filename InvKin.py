@@ -35,6 +35,11 @@ class InvKin:
         self.beta = 0.0
         self.gamma = 0.0
         
+        #Define initial point for arm
+        #self.ang.x = 1500
+        #self.ang.y = 1000
+        #self.ang.z = 1000
+        
         #Instantiate the subscriber EEP (end effector position), that will be recieving a Vector3 message and will be calling
         #the callback function callAng
         rospy.Subscriber('EEP', Vector3, self.callAng)
@@ -71,7 +76,7 @@ class InvKin:
         pointxc = self.p.x - self.a4 * np.cos(self.ang.x)
         #Same as above, just here is sin because we are in the y-axis and it's given in the presentation
         ##Py = pointyc 
-        ###CORRECRT
+        ###CORRECRT maybe an adjust of 8cm
         pointyc = self.p.y - self.a4 * np.sin(self.ang.x)
         #The last correction goes on z, but here we add one deviation and substract the other
         #d5 is added because the third joint is above the TCP, if we substracted it, then the TCP will try to go through the floor
@@ -111,7 +116,10 @@ class InvKin:
            self.ang.y = np.degrees(self.alpha + self.gamma)
            #z is beta minus 180
            ##self.ang.z = teta3 en grados - servo3 (0 a 90)
-           self.ang.z = abs((np.degrees(self.beta) - 180) + self.ang.y)
+           self.ang.z = abs(np.degrees(self.beta) - 180 + self.ang.y)
+           
+           #self.ang.y = self.ang.y + 40
+           #self.ang.z = self.ang.z + 50
           
            #Lastly, we convert from degrees to arduino microseconds for more precision
            #This formula was developed by us after trying to move a servo using the microseconds function from arduino
@@ -127,19 +135,17 @@ class InvKin:
            ##self.ang.y = teta2 en grados - servo2 (0 a 90)
            ##self.ang.z = teta3 en grados - servo3 (0 a 90)
            #With calibration we obtained:
-           self.ang.x = 650 + (self.ang.x * 1550) / 180 #Servo1 moves the base of the robot 650 (right 0') to 2200 (left - 180')
-           print(self.ang.x)
-           self.ang.y = 1150 + (self.ang.y * 700) / 90 #Servo2 moves the third joint from 1150 (floor 0') to 1850 (fold - 90')
-           print(self.ang.y)
-           self.ang.z = 900 + (self.ang.z * 1000) / 90 #Servo3 moves the base of the robot from 900 (escuadra 0') to 1900 (pico caido - 180')
-           print(self.ang.z)
+           self.ang.x = 500 + (self.ang.x * 2000) / 180 #Servo1 moves the base of the robot 650 (right 0') to 2200 (left - 180')
+           self.ang.y = 1000 + (self.ang.y * 600) / 90 #Servo2 moves the third joint from 1150 (floor 0') to 1850 (fold - 90')
+           self.ang.z = 1850 - (self.ang.z * 500) / 90 #Servo3 moves the base of the robot from 900 (escuadra 0') to 1900 (pico caido - 180')
           
         else:
+           print("Hola")
            #If the specified points are out of reach we decide to send the robot values to 0'
-           self.ang.x = 1400.0
-           self.ang.y = 1500.0
-           self.ang.z = 1500.0
-   
+           self.ang.x = 1500.0
+           self.ang.y = 1000.0
+           self.ang.z = 1850.0
+
     def callAng(self, p):
         #Assign the value recieved from the callback to the attribute p
         self.p = p
