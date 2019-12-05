@@ -22,7 +22,7 @@ class InvKin:
         #Save in variables the measured values of the robotic arm (in cm)
         #Used the same convention as the one in the presentation
         #L0 is the base and L1 is the revolute joint from the base
-        self.d1 = 10.5 #This is the distance of the offset from L0 to L2
+        self.d1 = 20 #This is the distance of the offset from L0 to L2 (we included de 8cm from the extra box we added and 1.5cm from the wood base)
         self.L2 = 14 #This is the value from the base (where the servos are) to the third joint
         self.L3 = 15.2 #This is the value from the thrid joint to the end effector (without the offset)
         self.a4 = 2.5 #This is the distance of the offset from L3 to the TCP (in x direction)
@@ -34,11 +34,6 @@ class InvKin:
         self.bins = 0.0
         self.beta = 0.0
         self.gamma = 0.0
-        
-        #Define initial point for arm
-        #self.ang.x = 1500
-        #self.ang.y = 1000
-        #self.ang.z = 1000
         
         #Instantiate the subscriber EEP (end effector position), that will be recieving a Vector3 message and will be calling
         #the callback function callAng
@@ -76,7 +71,7 @@ class InvKin:
         pointxc = self.p.x - self.a4 * np.cos(self.ang.x)
         #Same as above, just here is sin because we are in the y-axis and it's given in the presentation
         ##Py = pointyc 
-        ###CORRECRT maybe an adjust of 8cm
+        ###CORRECRT
         pointyc = self.p.y - self.a4 * np.sin(self.ang.x)
         #The last correction goes on z, but here we add one deviation and substract the other
         #d5 is added because the third joint is above the TCP, if we substracted it, then the TCP will try to go through the floor
@@ -135,12 +130,12 @@ class InvKin:
            ##self.ang.y = teta2 en grados - servo2 (0 a 90)
            ##self.ang.z = teta3 en grados - servo3 (0 a 90)
            #With calibration we obtained:
-           self.ang.x = 500 + (self.ang.x * 2000) / 180 #Servo1 moves the base of the robot 650 (right 0') to 2200 (left - 180')
-           self.ang.y = 1000 + (self.ang.y * 600) / 90 #Servo2 moves the third joint from 1150 (floor 0') to 1850 (fold - 90')
-           self.ang.z = 1850 - (self.ang.z * 500) / 90 #Servo3 moves the base of the robot from 900 (escuadra 0') to 1900 (pico caido - 180')
+           self.ang.x = 650 + (self.ang.x * 1600) / 180 #Servo1 moves the base of the robot 650 (right 0') to 2500 (left - 180')
+           self.ang.y = 1000 + (self.ang.y * 600) / 90 #Servo2 moves the second joint from 1000 (floor 0') to 1600 (fold - 90')
+           self.ang.z = 2400 - (self.ang.z * 500) / 90 #Servo3 moves the third joint from 1000 (escuadra 0') to 1900 (pico caido - 180')
+           #Considerar un mapeo de 1900 para base del robot y de 2400 para tablero
           
         else:
-           print("Hola")
            #If the specified points are out of reach we decide to send the robot values to 0'
            self.ang.x = 1500.0
            self.ang.y = 1000.0
