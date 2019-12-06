@@ -1,3 +1,4 @@
+
 // Select library depending on arduino
 #if (ARDUINO >= 100)
  #include <Arduino.h>
@@ -16,17 +17,22 @@ ros::NodeHandle  nh;
 //Create 3 servo objects, one for each servo motor
 Servo servo1, servo2, servo3;
 
+//Declare an array for saving callback information
+float mov[3] = {650, 1000, 1000};
+
 //Callback function; recieves a Vector3 constant
 void servo_cb(const geometry_msgs::Vector3& cmd_msg){
 
-  //Use microseconds to control servos with more precision
-  servo1.writeMicroseconds(cmd_msg.x); //set servo angle, should be from 0-180  
-  servo2.writeMicroseconds(cmd_msg.y); //set servo angle, should be from 0-180  
-  servo3.writeMicroseconds(cmd_msg.z); //set servo angle, should be from 0-180  
-  digitalWrite(13, HIGH-digitalRead(13));  //toggle led; used as debugging tool
+  //Save the callback information
+  if(mov[0] != cmd_msg.x)
+    mov[0] = cmd_msg.x;
+  else if(mov[1] != cmd_msg.y)
+    mov[1] = cmd_msg.y;
+  else if(mov[2] != cmd_msg.z)
+    mov[2] = cmd_msg.z;
 
-  //Wait to update position one second
-  delay(1000);
+  //toggle led; used as debugging tool
+  digitalWrite(13, HIGH-digitalRead(13));  
 }
 
 //Function to subscribe to the topic (RobAng) that publishes the angles in microseconds, has a Vector3 data type 
@@ -44,7 +50,7 @@ void setup(){
   nh.subscribe(sub);
   
   //Attatch a pin to the servo objects
-  servo1.attach(9); //attach it to pin 9    - Servo 1
+  servo1.attach(9); //attach it to pin 9   - Servo 1
   servo2.attach(10); //attach it to pin 10 - Servo 2
   servo3.attach(11); //attach it to pin 11 - Servo 3
 }
@@ -53,6 +59,12 @@ void setup(){
 void loop(){
   //This function manages the callbacks (it excecutes them)
   nh.spinOnce();
+    
+  //Use microseconds to control servos with more precision
+  servo1.writeMicroseconds(mov[0]); //Values from 1000 to 2000 aprox which map from 0 to 180' 
+  servo2.writeMicroseconds(mov[1]); //Values from 1000 to 2000 aprox which map from 0 to 180'  
+  servo3.writeMicroseconds(mov[2]); //Values from 1000 to 2000 aprox which map from 0 to 180'
+  
   //Delay just for synchronization
   delay(1);
 }
