@@ -71,7 +71,7 @@ class MarkerTracer:
         
         #In case the previous calculation outputs a value that may damage the TCP 
         #We just protect it from hitting the floor 
-        #3.5 is a value that leaves the camera in a rest position??????
+        #3.5 is a value that leaves the camera in a reasonable distance from the floor
         if(self.ang.z < 3.5):
             self.ang.z = 3.5
 
